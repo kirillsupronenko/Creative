@@ -143,7 +143,36 @@ team.forEach(member => {
   });
 });
 
+//  9. Smooth Scroll to Sections
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const targetId = link.getAttribute('href').substring(1);
+    const targetEl = document.getElementById(targetId);
+    if (!targetEl) return;
+
+    const startY = window.pageYOffset;
+    const targetY = targetEl.getBoundingClientRect().top + window.pageYOffset - 60; // немного отступа от шапки
+    const distance = targetY - startY;
+    const duration = 800;
+    let startTime = null;
+
+    function smoothScroll(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const ease = progress < 0.5
+        ? 2 * progress * progress
+        : -1 + (4 - 2 * progress) * progress; // easeInOut
+      window.scrollTo(0, startY + distance * ease);
+      if (progress < 1) requestAnimationFrame(smoothScroll);
+    }
+
+    requestAnimationFrame(smoothScroll);
+  });
+});
+
 
 //  (9): Dynamic Year 
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
+
